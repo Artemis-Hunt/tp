@@ -1,6 +1,12 @@
 # FinanceIt
 
-FinanceIt is a greenfield Java project. Given below are instructions on how to use it.
+FinanceIt is a greenfield Java project. 
+
+Features:
+- Tracking of one-time and recurring transactions
+- Tracking of savings goal
+- Calculation of simple/compound interest, cashbacks and miles.
+- Save and load profiles
 
 ## Setting up in Intellij
 
