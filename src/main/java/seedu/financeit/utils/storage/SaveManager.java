@@ -17,6 +17,8 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class SaveManager {
@@ -82,6 +84,14 @@ public class SaveManager {
             prompt = "Name cannot be empty!";
             return false;
         }
+
+        Pattern p = Pattern.compile("[^A-Za-z0-9]");
+        Matcher m = p.matcher(packet.getParam("/name"));
+        if (m.find()) {
+            prompt = "No spaces or special characters allowed! Alphanumeric only!";
+            return false;
+        }
+
         return true;
     }
 

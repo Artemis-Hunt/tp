@@ -49,6 +49,10 @@ finance calculator tools within it.
 * All ```LogicManager``` classes use the ```InputManager``` component to process user input, then use ```Logic``` component
 to perform the operation associated with the param handling.
 
+__Design decisions__ 
+* For each feature that involves some sort of query and response, we wanted a module of classes that handles such in a systematic fashion. 
+Five isolated classes that handles each feature in a self-contained manner helps to reduce overtly complex interactions between user and software.
+
 <div style="page-break-after: always;"></div>
 
 ## Logic Component
@@ -67,6 +71,14 @@ __API__
 associated with the `param`. For instance, `/date` will cause `CreateLedgerCommand` instance to set the date of the
 newly created ledger.  
 * `CommandHandler` in turn uses `ParamChecker` to verify validity of inputs before setting.
+
+__Design decisions__ 
+* The handling of parameters throughout the various features of the software have alot of common key features, including logic, input class (`CommandPacket`) 
+and error cases. Therefore we abstracted out the common behavior into an abstract class called `ParamHandler`, whereby the other `CommandHandler` classes inherit from.
+* Along the same philosophy, we designed the `ParamChecker` singleton class to consolidate a plethora of error handling methods whereby other `CommandHandlers` can use.
+This is fit for the software since many of the features share strong similarities in the handling of errors and exceptions.
+    * The alternative implementation, which is to implement logic of features independently of one another, would result in duplication of code and lack of common error-handling policy. 
+
 <!-- @@author-->
 
 <div style="page-break-after: always;"></div>
@@ -448,6 +460,8 @@ __<a name = table1></a> Param Handling Behavior__
 |---------|----------------|----------------|-----------|---------------------|
 |```PARAM.DATE```|"/date"|Various format of date in string, eg. "2020-03-02"| Call ```currLedger.setDate()``` to set date for the ```Ledger``` instance. | ```ParamChecker.checkAndReturnDate(packet)```|
 
+<div style="page-break-after: always;"></div>
+
 __<a name = diag1></a> Sequence Diagram__
 
 ![](uml_images/images_updated/manualTrackerCreateLedgerSeqDiagram.png)
@@ -477,9 +491,13 @@ __<a name = table2></a> Param Handling Behavior__
 |```PARAM.DATE```|"/date"|Various format of date in string, eg. "2020-03-02"| Call ```ledgerList.setIndexToModify()``` to set index of retrieved item. | ```ParamChecker.checkAndReturnDate(packet)```|
 |```PARAM.INDEX```|"/index"|Valid index on the list from 1 onwards.|Call ```ledgerList.setIndexToModify()``` to set index of retrieved item. | ```ParamChecker.checkAndReturnIndex(packet)```|
 
+<div style="page-break-after: always;"></div>
+
 __<a name = diag2></a> Sequence Diagram__
 
 ![](uml_images/images_updated/manualTrackerDeleteLedgerSeqDiagram.png)
+
+<div style="page-break-after: always;"></div>
 
 **<a name = entryseq></a>Entry Tracker: Edit of entries** <br />
 The editing of details within the entry is performed in two phases: Entry Retrieval and Entry Edit.
@@ -506,6 +524,8 @@ __<a name = table3></a> Param Handling Behavior__
 |---------|----------------|----------------|-----------|---------------------|
 |```PARAM.INDEX```|"/index"|Valid index on the list <br/>from 1 onwards.|Call ```entryList.setIndexToModify()``` <br/>to set index of retrieved item. | ```ParamChecker.checkAndReturnIndex(packet)```|
 
+<div style="page-break-after: always;"></div>
+
 __<a name = diag3></a> Sequence Diagram__ 
 
 ![](uml_images/images_updated/entryTrackerEditEntrySeqDiagram2.png)
@@ -519,6 +539,7 @@ __<a name = diag3></a> Sequence Diagram__
         1. Refer to the section on [Param Handling](#logic) for more details pertaining to general param handling. 
         1. For ```EditEntryHandler```, the ```handleSingleParam``` abstract method will be implemented as shown in the [following table](#table4).
     1. The edited entry is added back into the list.
+    
 __<a name = table4></a> Param Handling Behavior__          
 
 |ParamType|ParamType String| Expected Param | Operation | Verification method |
@@ -529,6 +550,8 @@ __<a name = table4></a> Param Handling Behavior__
 |```PARAM.EXP```|"-e"|Expense entry type flag|Call ```entryList.setEntryType(EntryType.EXP)``` to set index of retrieved item. | ```nil```|
 |```PARAM.DESCRIPTION```|"/desc"|Description in string, ';' character is illegal.|Call ```entryList.setDescription()``` to set index of retrieved item. | ```ParamChecker.checkAndReturnDescription(packet)```|
 |```PARAM.CATEGORY```|"/cat"|A set of strings that corresponds with entry type|Call ```entryList.setCategory()``` to set index of retrieved item. | ```ParamChecker.checkAndReturnCategories(packet)```|
+
+<div style="page-break-after: always;"></div>
 
 __<a name = diag4></a> Sequence Diagram__
 
@@ -1114,7 +1137,8 @@ You should see the following:
 > Note that the ledger of date 2020-07-07 was not created beforehand. However, the ledger will be automatically created by the operation, and will resume as per normal. 
 
 ## Testing EntryTracker
-1. The following testing guide assumes that testing at [7.2](#7.2) is completed.
+1. The following testing guide assumes that the test for __Manual Tracker__ has been completed.
+
 **Show Command List** <br />
 1. Enter ```commands``` into the console.
 You should see the following:
@@ -1252,9 +1276,8 @@ Enter `list`. Output:
     * E.g. if today is 15th, input will be `/day 22`
     * E.g. if today is 28th, input will be `/day 5` OR `day 4` depending on whether the current month has 30 or 31 days respectively.
 
-1. Enter `exit` to quit to main menu. Reminders are printed above the Main Menu prompt. Note: Screenshot was taken on 6th, hence entries entered above are on the 6th, 8th and 13th respective.
-
-    Output:
+1. Enter `exit` to quit to main menu. Reminders are printed above the Main Menu prompt. Note: Screenshot was taken on 6th, hence entries entered above are on the 6th, 8th and 13th respective. Output:
+    
 ![](developerGuide_images/screenshots_recurringtracker/reminders.png)
 
 1. Enter `exit` to quit the program. Run the .jar file again. Reminders are printed below the logo and above the Main Menu prompt.
